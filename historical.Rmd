@@ -1,0 +1,91 @@
+---
+title: "NEM Transfers Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+    css: style.css
+    navbar:
+      - { title: "Latest", href: "./index.html", align: left}
+      - { title: "Historical", href: "./historical.html", align: left}
+      - { title: "Twitter", href: "https://twitter.com/NEM_Harvest", align: right}
+      - { title: "Blog", href: "./blog/index.html", align: right}
+      - { title: "About", href: "./about.html", align: right }
+---
+
+```{r setup, include=FALSE}
+library(data.table)
+library(dplyr)
+library(flexdashboard)
+library(plotly)
+
+data <- fread("~/nem_harvest/daily.csv") %>% as.data.frame()
+# For better view in axis.
+data$Date <- as.Date(data$Date) 
+
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### Daily
+
+```{r}
+historical <- plot_ly(data, x = ~Date, y = ~Transfers, type = 'bar', name = 'Transfers') %>%
+  add_trace(y = ~Senders, name = 'Senders') %>%
+  add_trace(y = ~Recipients, name = 'Recipients') %>% 
+  layout(yaxis = list(title = 'Num'), barmode = 'group')
+
+historical
+```
+
+Row {data-height=350}
+-----------------------------------------------------------------------
+
+### Number of Transfers BEST20
+
+```{r}
+transfers_ranking <- data %>% 
+  dplyr::arrange(desc(Transfers)) %>% 
+  dplyr::select(Date, Transfers)
+
+transfers_ranking <- transfers_ranking[1:20,]
+
+knitr::kable(transfers_ranking)
+```
+
+### Number of Senders BEST20
+
+```{r}
+senders_ranking <- data %>% 
+  dplyr::arrange(desc(Senders)) %>% 
+  dplyr::select(Date, Senders)
+
+senders_ranking <- senders_ranking[1:20,]
+
+knitr::kable(senders_ranking)
+```
+
+### Number of Recipients BEST20
+
+```{r}
+recipients_ranking <- data %>% 
+  dplyr::arrange(desc(Recipients)) %>% 
+  dplyr::select(Date, Recipients)
+
+recipients_ranking <- recipients_ranking[1:20,]
+
+knitr::kable(recipients_ranking)
+```
+
+### Null Block % BEST20
+
+```{r}
+null_ranking <- data %>% 
+  dplyr::arrange(Null) %>% 
+  dplyr::select(Date, Null)
+
+null_ranking <- null_ranking[1:20,]
+
+knitr::kable(null_ranking)
+```

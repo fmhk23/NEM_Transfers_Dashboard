@@ -1,0 +1,92 @@
+---
+title: "NEM Transfers Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+    css: style.css
+    navbar:
+      - { title: "Latest", href: "./index.html", align: left}
+      - { title: "Historical", href: "./historical.html", align: left}
+      - { title: "Twitter", href: "https://twitter.com/NEM_Harvest", align: right}
+      - { title: "Blog", href: "./blog/index.html", align: right}
+      - { title: "About", href: "./about.html", align: right }
+---
+
+
+```{r setup, include=FALSE}
+library(data.table)
+library(dplyr)
+library(flexdashboard)
+library(plotly)
+library(xts)
+
+data <- fread("~/nem_harvest/daily.csv") %>% as.data.frame()
+# For better view in axis.
+data$Date <- as.Date(data$Date) 
+row_yesterday <- nrow(data) - 1
+
+# Generate Dataset for the latest plots.
+weekly <- data[(row_yesterday - 6): row_yesterday,]
+monthly <- data[(row_yesterday - 29): row_yesterday,]
+```
+
+
+### Daily Report:`r Sys.Date()`
+
+Row {data-height=150}
+-----------------------------------------------------------------------
+
+### Transfers
+
+```{r}
+valueBox(data$Transfers[row_yesterday],
+         icon = "glyphicon-transfer")
+```
+
+### Senders
+
+```{r}
+valueBox(data$Senders[row_yesterday],
+         icon = "glyphicon-send")
+```
+
+### Recipients
+
+```{r}
+valueBox(data$Recipients[row_yesterday],
+         icon = "glyphicon-import")
+```
+
+### NULL Block%
+
+```{r}
+gauge(data$Null[row_yesterday], min = 0, max = 100)
+```
+
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### Last 7 days
+
+```{r}
+p7 <- plot_ly(weekly, x = ~Date, y = ~Transfers, type = 'bar', name = 'Transfers') %>%
+  add_trace(y = ~Senders, name = 'Senders') %>%
+  add_trace(y = ~Recipients, name = 'Recipients') %>% 
+  layout(yaxis = list(title = 'Num'), barmode = 'group')
+
+p7
+```
+
+### Last 30 days
+
+```{r}
+p30 <- plot_ly(monthly, x = ~Date, y = ~Transfers, type = 'bar', name = 'Transfers') %>%
+  add_trace(y = ~Senders, name = 'Senders') %>%
+  add_trace(y = ~Recipients, name = 'Recipients') %>% 
+  layout(yaxis = list(title = 'Num'), barmode = 'group')
+
+p30
+```
+
