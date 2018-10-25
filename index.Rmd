@@ -30,7 +30,7 @@ monthly <- data[(row_yesterday - 29): row_yesterday,]
 ```
 
 
-### Daily Report:`r Sys.Date()`
+### Daily Report:`r Sys.Date() - 1`
 
 Row {data-height=150}
 -----------------------------------------------------------------------

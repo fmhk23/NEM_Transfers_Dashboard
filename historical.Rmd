@@ -19,6 +19,8 @@ library(flexdashboard)
 library(plotly)
 
 data <- fread("~/nem_harvest/daily.csv") %>% as.data.frame()
+# Remove today
+data <- data[1:nrow(data)-1,]
 # For better view in axis.
 data$Date <- as.Date(data$Date) 
 
