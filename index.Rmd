@@ -9,6 +9,8 @@ output:
       - { title: "Latest", href: "./index.html", align: left}
       - { title: "Historical", href: "./historical.html", align: left}
       - { title: "Twitter", href: "https://twitter.com/NEM_Harvest", align: right}
+  includes:
+    in_header: GoogleAnalytics.html
 ---
 
 
